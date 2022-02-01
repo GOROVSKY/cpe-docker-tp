@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  backend:
+    build: ./backend-api # Le dossier oèu se situe notre Dockerfile à build
+    networks: # On assigne notre container à un network
+      - my-network
+    depends_on:
+    #TODO
+  database:
+    build: ./database-app
+    networks:
+      - my-network
+  httpd:
+    build: ./http-server
+    ports: # La conversion de port 
+      - "8090:80"
+    networks:
+      - my-network
+    depends_on:
+    #TODO
+networks: # Déclaration des networks 
+  my-network: app-network

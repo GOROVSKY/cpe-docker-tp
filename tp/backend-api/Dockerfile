@@ -1,5 +1,6 @@
 # Build
-#On nomme notre jdk via AS myapp-build qu'on pourra réutiliser ensuite pour le run
+# On nomme notre jdk via AS myapp-build qu'on pourra réutiliser ensuite pour le run
+# Le jdk permet de compiler le java
 FROM maven:3.6.3-jdk-11 AS myapp-build
 
 #On se place dans un dossier
@@ -17,6 +18,7 @@ RUN mvn package -DskipTests dependency:go-offline
 
 
 # Run
+# On part d'une image plus simple pour avoir une empreinte mémoire plus légère
 FROM openjdk:11-jre
 ENV MYAPP_HOME /opt/myapp
 WORKDIR $MYAPP_HOME
