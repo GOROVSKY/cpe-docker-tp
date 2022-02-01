@@ -126,7 +126,7 @@ FROM  httpd:2.4
 COPY  .  /usr/local/apache2/htdocs/
 ```
 * Après création d'un index.html, build du container : `docker build -t guillaumelaville/http-server .`
-* Lancement du container : `docker run --name http-server -p 8090:80 guillaumelaville/http-server`
+* Lancement du container : `docker run --name http-server -p 8090:80 --network app-network guillaumelaville/http-server`
 * Mon index.html s'affiche bien sur `localhost:8090`
 
 
@@ -139,7 +139,7 @@ COPY  .  /usr/local/apache2/htdocs/
 #### Configuration
 * J'utilise *docker exec* pour exécuter une commande dans mon container existant (nommé http-server) : `docker exec -it http-server cat /usr/local/apache2/conf/httpd.conf`
 * La configuration d'apache2 s'affiche dans le terminal car on se trouve dans le container
-* On peut copier cette configuration dans notre dossier local après avoir créé le fichier httpd.conf : `docker cp id_contianer:/usr/local/apache2/conf/httpd.conf httpd.conf`
+* On peut copier cette configuration dans notre dossier local après avoir créé le fichier httpd.conf : `docker cp id_container:/usr/local/apache2/conf/httpd.conf httpd.conf`
 
 #### Reverse proxy
 * Après avoir récupéré la configuration et l'avoir modifiée, je modifie le Dockerfile pour copier cette nouvelle configuration dans le container :
@@ -158,7 +158,36 @@ COPY  httpd.conf  /usr/local/apache2/conf/httpd.conf
 **Penser à mettre le container proxy dans le même network ...** 
 
 #### Docker-compose
+```Docker-compose
+version: '3.3'  # La version de notre Docker compose
+services: # Déclaration des services à builddpc
+	backend-api:
+		build: ./backend-api  # Le dossier où se situe notre Dockerfile à build
+		networks: # On assigne notre container à un network
+			- app-network
+		depends_on: # On précise que notre service dépend d'un autre
+			- database
+	database:
+		build: ./database-app
+		networks:
+			- app-network
+	httpd:
+		build: ./http-server
+		ports: # La conversion de port
+			- "8080:80"
+		networks:
+			- app-network
+		depends_on:
+			- backend-api
+networks: # Déclaration des networks
+	app-network:
+```
+
+* Lancer un docker-compose : `docker-compose up`
+* Les ports du backend et de la database ne sont pas ouverts
 
 #### Publish
-
-
+* Je me connecte à docker hub : `docker login`
+* Je tag mon image de database : `docker tag database guillaumelaville/database:1.0`
+* Je mets en ligne mon image : `docker push guillaumelaville/database`
+* Je me connecte sur mon profil docker hub et je constate bien que mon image a été publiée : grâce à cela j'aurais accès à mon image sur différents PC et créer des containers dans différents environnements
