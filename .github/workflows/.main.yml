@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - main
-      # - develop
+      - develop
   pull_request:
 jobs:
   test-backend:
@@ -19,6 +19,6 @@ jobs:
           distribution: 'adopt'
 
         #finally build your app with the latest command
-      working-directory: ./tp/backend-api
       - name: Build and test with Maven
+        working-directory: ./tp/backend-api
         run: mvn clean verify
