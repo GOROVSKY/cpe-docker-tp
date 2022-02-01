@@ -17,9 +17,9 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           java-version: '11'
-     
+          distribution: 'adopt'
+
       #finally build your app with the latest command
       - name: Build and test with Maven
-        run: |
-          cd ./tp/backend-api/
-          mvn clean verify
+      working-directory: ./tp/backend-api
+        run: mvn clean verify
