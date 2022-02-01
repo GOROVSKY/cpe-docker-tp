@@ -5,7 +5,7 @@ services:
     networks: # On assigne notre container à un network
       - my-network
     depends_on:
-    #TODO
+      - database
   database:
     build: ./database-app
     networks:
@@ -17,6 +17,6 @@ services:
     networks:
       - my-network
     depends_on:
-    #TODO
+      - backend
 networks: # Déclaration des networks 
   my-network: app-network
