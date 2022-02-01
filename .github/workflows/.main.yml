@@ -20,6 +20,6 @@ jobs:
           distribution: 'adopt'
 
       #finally build your app with the latest command
-      - name: Build and test with Maven
       working-directory: ./tp/backend-api
+      - name: Build and test with Maven
         run: mvn clean verify
