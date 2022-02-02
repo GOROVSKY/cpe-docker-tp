@@ -13,11 +13,18 @@ services: # Déclaration des services à builddpc
   httpd:
     build: ./http-server
     ports: # La conversion de port 
-      - "8080:80"
+      - "80:80"
+      - "8080:8080"
     networks:
       - app-network
     depends_on:
       - backend-api
+      - frontend
+
+  frontend:
+    build: ./frontend
+    networks:
+      - app-network
 networks: # Déclaration des networks 
   app-network:
 
