@@ -6,8 +6,8 @@
     name: httpd
     image: guillaumelaville/tp-devops-cpe:http-server
     expose:
-    - 80
-    - 8080
+      - 80
+      - 8080
     ports:
-    - "80:80"
-    - "8080:8080"
+      - "80:80"
+      - "8080:8080"

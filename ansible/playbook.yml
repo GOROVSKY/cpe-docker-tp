@@ -20,6 +20,10 @@
       import_role:
         name: proxy
 
+    - name: Launch the frontend
+      import_role:
+        name: frontend
+
     - name: Create the network
       import_role:
         name: network
