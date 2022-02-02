@@ -8,3 +8,4 @@
       - database
       - backend-api
       - httpd
+      - frontend

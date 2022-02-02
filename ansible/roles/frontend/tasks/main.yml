@@ -1,0 +1,7 @@
+---
+# tasks file for roles/frontend
+
+- name: Run Frontend
+  docker_container:
+    name: frontend
+    image: guillaumelaville/tp-devops-cpe:frontend
