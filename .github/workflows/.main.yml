@@ -20,6 +20,9 @@ jobs:
 
         #finally build your app with the latest command
       - name: Build and test with Maven
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./tp/backend-api
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=GOROVSKY_cpe-docker-tp
             -Dsonar.organization=gorovsky
