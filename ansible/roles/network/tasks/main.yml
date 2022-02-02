@@ -1,0 +1,10 @@
+---
+# tasks file for roles/network
+
+- name: Remove all but selected list of containers
+  docker_network:
+    name: app-network
+    connected:
+      - database
+      - backend-api
+      - httpd

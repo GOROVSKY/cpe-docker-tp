@@ -1,0 +1,11 @@
+---
+# tasks file for roles/database
+
+- name: Run POSTGRES
+  docker_container:
+    name: database
+    image: guillaumelaville/tp-devops-cpe:database
+    env: 
+      POSTGRES_DB: '{{ my_postgres_db }}'
+      POSTGRES_USER: '{{ my_postgres_user }}'
+      POSTGRES_PASSWORD: '{{ my_postgres_pwd }}'

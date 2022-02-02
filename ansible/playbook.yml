@@ -1,0 +1,25 @@
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  # Install Docker
+  tasks:
+    - name: Import the docker role
+      import_role:
+        name: docker
+
+    - name: Launch the database
+      import_role:
+        name: database
+
+    - name: Launch the backend
+      import_role:
+        name: backend
+
+    - name: Launch the proxy
+      import_role:
+        name: proxy
+
+    - name: Create the network
+      import_role:
+        name: network

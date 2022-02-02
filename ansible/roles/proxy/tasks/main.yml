@@ -1,0 +1,8 @@
+---
+# tasks file for roles/proxy
+
+- name: Run HTTPD
+  docker_container:
+    name: httpd
+    image: guillaumelaville/tp-devops-cpe:http-server
+    published_ports: 80:80

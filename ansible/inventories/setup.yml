@@ -2,6 +2,9 @@ all:
   vars:
     ansible_user: centos # On indique l'utilisateur qui souhaite établir une connexion avec les serveurs  
     ansible_ssh_private_key_file: ../id_rsa # On indique notre clef rsa
+    my_postgres_db: "db"
+    my_postgres_user: "usr"
+    my_postgres_pwd: "pwd"
   children:
     prod:
       hosts: guillaume.laville.takima.cloud # On spécifie l'adresse de notre serveur en pro
