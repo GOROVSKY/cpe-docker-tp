@@ -158,6 +158,7 @@ COPY  httpd.conf  /usr/local/apache2/conf/httpd.conf
 **Penser à mettre le container proxy dans le même network ...** 
 
 #### Docker-compose
+* Docker-compose est un manager au-dessus de docker, on lui fourni des images à compiler
 ```Docker-compose
 version: '3.3'  # La version de notre Docker compose
 services: # Déclaration des services à builddpc
@@ -191,3 +192,80 @@ networks: # Déclaration des networks
 * Je tag mon image de database : `docker tag database guillaumelaville/database:1.0`
 * Je mets en ligne mon image : `docker push guillaumelaville/database`
 * Je me connecte sur mon profil docker hub et je constate bien que mon image a été publiée : grâce à cela j'aurais accès à mon image sur différents PC et créer des containers dans différents environnements
+
+
+
+## TP 2
+### Setup Github Actions
+* *Testcontainers* est une classe Java qui permet de réaliser des test unitaires et autres en instanciant par exemple des bases de données conteneurisées.
+* Build et tester une application : `mvn clean verify` à l'endroit où se trouve le fichier pom.xml qui contient les dépendances et les types de tests réalisables
+```yml
+name: CI devops 2022 CPE
+on:
+	push: # le déclencheur
+		branches: # les branches concernées
+			- main
+			- develop
+	pull_request:
+jobs:
+	test-backend: # le nom du job
+		runs-on: ubuntu-18.04 # on spécifie l'OS
+		steps: # les étapes du job
+			- uses: actions/checkout@v2.3.3 # on fait un using pour spécifier comme chargé
+			- name: Set up JDK 11
+				uses: actions/setup-java@v2 
+				with: # on met en place une jdk 11
+					java-version: '11'
+					distribution: 'adopt'
+			- name: Build and test with Maven
+				working-directory: ./tp/backend-api # on se place dans le dossier de l'appli
+				run: mvn clean verify # on build et test notre aplication 
+```
+* Ajout des variables secrètes dans github actions pour ne pas faire trainer les login/mot de passe en clair dans les commit : 
+	* Settings -> Secrets -> Actions : **DOCKERHUB_USERNAME**  
+	* J'enregistre aussi mon token généré sur Dockerhub : `41f14573-b06a-4af3-9b3d-b899e0d844e0`
+
+* On build nos images grâce à la pipeline : 
+	* On écrit le nouveau job `needs: build-and-test-backend`
+	* On rajoute une étape de login à Docker hub puis les étapes de push des images avec en tag les credentials Dockerhub (enregistrés en secret sur github)
+	* Au moment de commit, la pipeline est lancée 
+		* D'abbord le job test-backend qui réussi
+		* Puis build and push docker images : quand terminé, mes images sont publiées sur mon Dockerhub !
+
+#### Setup Quality Gate
+ * Je me conncte sur SonerCloud via mon compte GitHub et je choisis mon projet à analyser
+	 *	Project key : `GOROVSKY_cpe-docker-tp`
+	 *	Sonar token : `0e6bf54ac126083a02ad89df8325fe220964e53b`
+
+```yml
+- name: Build and test with Maven
+	env:
+		GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+		SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+	working-directory: ./tp/backend-api
+	run: mvn -B verify sonar:sonar -Dsonar.projectKey=GOROVSKY_cpe-docker-tp
+		-Dsonar.organization=gorovsky
+		-Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./pom.xml
+```
+
+## TP 3
+### Intro
+* Création du chemin ansible/inventories
+* Ajout du fichier setup.yml :
+ ```yml
+ all:
+	vars:
+		ansible_user: centos # On indique l'utilisateur qui souhaite établir une connexion avec les serveurs
+		ansible_ssh_private_key_file: ../id_rsa # On indique notre clef rsa
+	children:
+		prod:
+			hosts: guillaume.laville.takima.cloud # On spécifie l'adresse de notre serveur en pro
+ ```
+ * Test de ping : `ansible all -i inventories/setup.yml -m ping`
+
+ ### Facts
+* Les facts sont des informations déduites par ansible lors de la communication avec le server : `ansible all -i inventories/setup.yml -m setup -a "filter=ansible_distribution*"`
+	* ansible_distribution : CentOS
+	* ansible_distribution_version : 8 
+* On peut supprimer httpd en indiquant l'état du server (avec httpd de supprimé) : `ansible all -i inventories/setup.yml -m yum -a "name=httpd state=absent" --become`
+

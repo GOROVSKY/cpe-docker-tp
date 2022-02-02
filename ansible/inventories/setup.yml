@@ -1,0 +1,7 @@
+all:
+  vars:
+    ansible_user: centos # On indique l'utilisateur qui souhaite établir une connexion avec les serveurs  
+    ansible_ssh_private_key_file: ../id_rsa # On indique notre clef rsa
+  children:
+    prod:
+      hosts: guillaume.laville.takima.cloud # On spécifie l'adresse de notre serveur en pro
