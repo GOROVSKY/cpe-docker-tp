@@ -16,10 +16,6 @@
       import_role:
         name: backend
 
-    - name: Launch the frontend
-      import_role:
-        name: frontend
-
     - name: Launch the proxy
       import_role:
         name: proxy

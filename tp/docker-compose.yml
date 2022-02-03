@@ -14,7 +14,6 @@ services: # Déclaration des services à builddpc
     build: ./http-server
     ports: # La conversion de port 
       - "80:80"
-      - "8080:8080"
     networks:
       - app-network
     depends_on:
