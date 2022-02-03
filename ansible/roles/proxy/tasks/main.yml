@@ -5,4 +5,5 @@
   docker_container:
     name: httpd
     image: guillaumelaville/tp-devops-cpe:http-server
+    ports: 80:80
    

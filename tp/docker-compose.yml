@@ -18,12 +18,6 @@ services: # Déclaration des services à builddpc
       - app-network
     depends_on:
       - backend-api
-      - frontend
-
-  frontend:
-    build: ./frontend
-    networks:
-      - app-network
 networks: # Déclaration des networks 
   app-network:
 
