@@ -269,3 +269,80 @@ jobs:
 	* ansible_distribution_version : 8 
 * On peut supprimer httpd en indiquant l'état du server (avec httpd de supprimé) : `ansible all -i inventories/setup.yml -m yum -a "name=httpd state=absent" --become`
 
+###Playbooks
+* On exécute notre premier playbook avec la commande : `ansible-playbook -i inventories/setup.yml playbook.yml`
+* On modifie le playbook pour avoir Docker d'installé sur le serveur
+* On met en place un **rôle** dont le but sera de gérer l'installation de docker : `ansible-galaxy init roles/docker`. On modifie le fichier main.yml dans le dossier tasks du rôle *docker*.
+* Notre playbook avec rôle importé :
+
+```yml
+- hosts: all
+	gather_facts: false
+	become: yes
+
+	tasks:
+		- name: Import the docker role  # Installation de docker
+		  import_role: # on importe un rôle
+			name: docker  # on nomme le rôle à importer (les tasks du main.yml du rôle sont exécutées)
+```
+
+### Deploy your app
+
+* On crée 5 rôles qui auront les fonctions suivantes :
+	* docker : installer docker
+	* network : création d'un réseau privé pour les containers
+	* database : lancement du container BD
+	* backend : lancement du container API-backend
+	* proxy : lancement du container proxy
+* Nos tasks de rôles containers ressemblent à :
+```yml
+# tasks file for roles/proxy
+- name: Run HTTPD # nom de la task
+  docker_container: # module pour créer un container docker
+    name: httpd # nom du container
+    image: guillaumelaville/tp-devops-cpe:http-server # l'image de notre container
+    ports: 80:80 # le binding de port ouvert
+```
+* Le playbook final ressemble à :
+```yml
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Import the docker role  # Installation de docker
+      import_role: # on importe un rôle
+        name: docker  # on nomme le rôle à importer (les tasks du main.yml du rôle sont exécutées)
+
+    - name: Launch the database
+      import_role:
+        name: database
+
+    - name: Launch the backend
+      import_role:
+        name: backend
+
+    - name: Launch the proxy
+      import_role:
+        name: proxy
+
+    - name: Create the network
+      import_role:
+        name: network
+```
+* Conclusion : après exécution du playbook, nos containers sont bien déployés sur le serveur et on accède à notre proxy/api.
+
+### Front
+* On rajoute un rôle frontend :
+```yml
+- name: Run Frontend
+  docker_container:
+    name: frontend
+    image: guillaumelaville/tp-devops-cpe:frontend
+    ports: 80:80
+```
+* On modifie les paramètres de notre proxy pour spécifier que les requêtes sur port 80 se redirigent sur le container frontend et que les requêtes 8080 sur le backend
+* On modifie les ports ouverts du backend dans le main.yml du rôle backend
+* On supprime toutes les images/containers de notre serveur, on relance notre playbook pour tout réinstaller avec les dernières versions (après avoir push sur git). 
+
+
